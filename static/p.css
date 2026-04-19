@@ -501,6 +501,9 @@ body {
     background-color: var(--bg-card);
     width: 90%;
     max-width: 500px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
     border-radius: 20px;
     border: 1px solid var(--glass-border);
     overflow: hidden;
@@ -532,6 +535,9 @@ body {
 
 .bill-body {
     padding: 30px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 .receipt-item {
