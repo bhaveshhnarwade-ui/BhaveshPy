@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gourmet Bites | Order Online</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/p.css">
+</head>
+<body>
+
+    <!-- Welcome Overlay -->
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="welcome-content">
+            <h1>Welcome to Gourmet Bites</h1>
+            <p>Please enter your name to start ordering</p>
+            <input type="text" id="customerName" placeholder="Your Name" autocomplete="off">
+            <button id="startOrderingBtn">Start Ordering</button>
+            <div class="made-by">Made By Runtime Terrors</div>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-utensils"></i>
+            <span>Gourmet Bites</span>
+        </div>
+        <div class="cart-btn" id="openCartBtn">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="cart-count" id="cartCount">0</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Savor the Flavor</h1>
+            <p>Order your favorite dishes with a single click. Fresh, fast, and delicious.</p>
+        </section>
+
+        <!-- Category Filter -->
+        <section class="categories" id="categoryFilter">
+            <button class="cat-btn active" data-category="All">All</button>
+            <!-- Categories will be injected here dynamically -->
+        </section>
+
+        <!-- Menu Grid -->
+        <section class="menu-grid" id="menuGrid">
+            <!-- Menu items injected dynamically -->
+            <div class="loading">Loading menu...</div>
+        </section>
+    </main>
+
+    <!-- Shopping Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h2>Your Order</h2>
+            <button class="close-cart" id="closeCartBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items injected here -->
+            <p class="empty-cart-msg">Your cart is empty.</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-summary">
+                <div class="summary-line">
+                    <span>Subtotal</span>
+                    <span id="subtotalAmount">$0.00</span>
+                </div>
+            </div>
+            <button class="checkout-btn" id="checkoutBtn" disabled>Proceed to Checkout</button>
+        </div>
+    </div>
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <!-- Bill Modal -->
+    <div class="bill-modal" id="billModal">
+        <div class="bill-content">
+            <div class="bill-header">
+                <h2>Receipt</h2>
+                <button class="close-bill" id="closeBillBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="bill-body" id="billBody">
+                <!-- Bill injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
