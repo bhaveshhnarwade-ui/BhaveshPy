@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walkthrough — Gourmet Bites</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0804; --card: #14100a; --card2: #1c1610;
+            --gold: #c9a84c; --gold2: #e8c96a;
+            --cream: #f5f0e8; --muted: #9a8a7a;
+            --border: rgba(201,168,76,0.22);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit',sans-serif; }
+        body { background:var(--bg); color:var(--cream); min-height:100vh; }
+
+        header {
+            background:rgba(10,8,4,0.97); border-bottom:1px solid var(--border);
+            padding:18px 6%; display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:10; backdrop-filter:blur(12px);
+        }
+        .hdr-logo { display:flex; align-items:center; gap:10px; color:var(--gold);
+            font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:700; text-decoration:none; }
+        .back-btn {
+            display:flex; align-items:center; gap:7px; color:var(--muted);
+            text-decoration:none; font-size:.88rem; transition:color .2s;
+        }
+        .back-btn:hover { color:var(--gold); }
+
+        .page { max-width:860px; margin:0 auto; padding:50px 5% 80px; }
+
+        .page-hero { text-align:center; margin-bottom:52px; }
+        .page-hero .crown { font-size:2.8rem; color:var(--gold); margin-bottom:16px; }
+        .page-hero h1 { font-family:'Cormorant Garamond',serif; font-size:3rem;
+            background:linear-gradient(135deg,#c9a84c,#f0d080,#c9a84c);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .page-hero p { color:var(--muted); margin-top:10px; font-size:1rem; }
+        .badge-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:18px; }
+        .badge { padding:5px 14px; border-radius:20px; font-size:.78rem; font-weight:700; border:1px solid var(--border); color:var(--gold); }
+
+        /* Sections */
+        .section { margin-bottom:44px; }
+        .section-title {
+            font-family:'Cormorant Garamond',serif; font-size:1.7rem; color:var(--gold);
+            display:flex; align-items:center; gap:10px; margin-bottom:18px;
+            padding-bottom:12px; border-bottom:1px solid var(--border);
+        }
+        .section-title i { font-size:1.2rem; }
+        p.body-text { color:var(--muted); line-height:1.8; font-size:.95rem; margin-bottom:14px; }
+
+        /* Table */
+        table { width:100%; border-collapse:collapse; margin-bottom:14px; }
+        th { background:var(--card2); color:var(--gold); font-size:.82rem;
+             text-transform:uppercase; letter-spacing:.5px; padding:10px 14px; text-align:left; }
+        td { padding:10px 14px; font-size:.9rem; color:var(--cream); border-bottom:1px solid var(--border); }
+        tr:hover td { background:rgba(201,168,76,0.04); }
+
+        /* Code block */
+        pre {
+            background:var(--card2); border:1px solid var(--border);
+            border-radius:12px; padding:18px 20px; overflow-x:auto;
+            font-size:.85rem; color:#b0e0b0; margin-bottom:14px; line-height:1.6;
+        }
+        code { font-family:monospace; }
+
+        /* Feature cards */
+        .feature-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; }
+        .feature-card {
+            background:var(--card); border:1px solid var(--border); border-radius:14px;
+            padding:18px; transition:border-color .2s, box-shadow .2s;
+        }
+        .feature-card:hover { border-color:var(--gold); box-shadow:0 0 18px rgba(201,168,76,0.12); }
+        .feature-card .icon { font-size:1.5rem; margin-bottom:10px; }
+        .feature-card h3 { font-size:.95rem; color:var(--cream); margin-bottom:5px; }
+        .feature-card p { font-size:.82rem; color:var(--muted); line-height:1.5; }
+
+        /* File tree */
+        .file-tree { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px 22px; }
+        .file-tree ul { list-style:none; padding-left:18px; }
+        .file-tree > ul { padding-left:0; }
+        .file-tree li { padding:4px 0; font-size:.88rem; color:var(--muted); font-family:monospace; }
+        .file-tree li span.name { color:var(--cream); }
+        .file-tree li span.gold { color:var(--gold); }
+        .file-tree li span.note { color:var(--muted); font-size:.78rem; margin-left:8px; }
+
+        /* Tag demos */
+        .tag-demos { display:flex; gap:10px; flex-wrap:wrap; }
+        .tag-demo { padding:5px 12px; border-radius:20px; font-size:.78rem; font-weight:700; }
+        .t-best { background:var(--gold); color:#0a0804; }
+        .t-chef { background:#8B6914; color:#fff0d0; }
+        .t-new  { background:#1a4a1a; color:#90ee90; border:1px solid #3a8a3a; }
+
+        footer-wt {
+            display:block; text-align:center; padding:24px;
+            color:var(--muted); font-size:.82rem; border-top:1px solid var(--border);
+        }
+        footer-wt a { color:var(--gold); text-decoration:none; }
+    </style>
+</head>
+<body>
+<script>
+    let pwd = prompt("Enter Admin Password to view the Walkthrough:");
+    if (pwd !== "Nir@123") {
+        document.body.innerHTML = "<div style='display:flex; justify-content:center; align-items:center; height:100vh; background:#0a0804; color:#ef4444; font-size:2rem; font-family:sans-serif;'>Access Denied</div>";
+        throw new Error("Access Denied");
+    }
+</script>
+
+<header>
+    <a class="hdr-logo" href="/"><i class="fa-solid fa-utensils"></i> Gourmet Bites</a>
+    <a class="back-btn" href="/"><i class="fa-solid fa-arrow-left"></i> Back to Menu</a>
+</header>
+
+<div class="page">
+
+    <!-- Hero -->
+    <div class="page-hero">
+        <div class="crown"><i class="fa-solid fa-crown"></i></div>
+        <h1>Project Walkthrough</h1>
+        <p>A complete guide to the Gourmet Bites luxury ordering system</p>
+        <div class="badge-row">
+            <span class="badge"><i class="fa-brands fa-python"></i> Flask</span>
+            <span class="badge"><i class="fa-solid fa-map-location-dot"></i> Leaflet + OSM</span>
+            <span class="badge"><i class="fa-solid fa-lock"></i> Inspect Guard</span>
+        </div>
+    </div>
+
+    <!-- Features Overview -->
+    <div class="section">
+        <div class="section-title"><i class="fa-solid fa-star"></i> Features</div>
+        <div class="feature-grid">
+            <div class="feature-card"><div class="icon">🔍</div><h3>Live Search</h3><p>Real-time filtering across all menu items as you type.</p></div>
+            <div class="feature-card"><div class="icon">📍</div><h3>Delivery Range Guard</h3><p>GPS check on login. &gt;15 km shows an out-of-range screen instead of the menu.</p></div>
+            <div class="feature-card"><div class="icon">⏱</div><h3>Smart ETA on Receipt</h3><p>Avg kitchen prep + travel (4 min/km) + 5 min handoff — shown only after order is placed.</p></div>
+            <div class="feature-card"><div class="icon">🗺</div><h3>Live Delivery Map</h3><p>Leaflet + OpenStreetMap route shown in receipt: restaurant pin → your location.</p></div>
+            <div class="feature-card"><div class="icon">🏷</div><h3>Tags</h3><p>Bestseller, Chef Special &amp; New badges on menu cards.</p></div>
+            <div class="feature-card"><div class="icon">📱</div><h3>Mobile</h3><p>Compact horizontal list layout on small screens.</p></div>
+            <div class="feature-card"><div class="icon">🗄</div><h3>SQLite DB</h3><p>Auto-created database with 50 seeded menu items.</p></div>
+            <div class="feature-card"><div class="icon">🔒</div><h3>Inspect Protection</h3><p>Right-click off, F12/Ctrl+Shift+I blocked, DevTools window-size detection.</p></div>
+        </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="section">
+        <div class="section-title"><i class="fa-solid fa-layer-group"></i> Tech Stack</div>
+        <table>
+            <tr><th>Layer</th><th>Technology</th></tr>
+            <tr><td>Backend</td><td>Python 3 + Flask</td></tr>
+            <tr><td>Database</td><td>SQLite (stdlib sqlite3)</td></tr>
+            <tr><td>Frontend</td><td>HTML5 + Vanilla CSS + Vanilla JS</td></tr>
+            <tr><td>Map</td><td>Leaflet 1.9.4 + OpenStreetMap (free, no API key)</td></tr>
+            <tr><td>Geolocation</td><td>Browser Geolocation API (navigator.geolocation)</td></tr>
+            <tr><td>Icons</td><td>Font Awesome 6</td></tr>
+            <tr><td>Fonts</td><td>Cormorant Garamond + Outfit (Google Fonts)</td></tr>
+            <tr><td>Images</td><td>Unsplash CDN</td></tr>
+        </table>
+    </div>
+
+    <!-- Tags -->
+    <div class="section">
+        <div class="section-title"><i class="fa-solid fa-tags"></i> Menu Tags</div>
+        <div class="tag-demos" style="margin-bottom:16px;">
+            <span class="tag-demo t-best">🥇 Bestseller</span>
+            <span class="tag-demo t-chef">👨‍🍳 Chef Special</span>
+            <span class="tag-demo t-new">✨ New</span>
+        </div>
+        <table>
+            <tr><th>Tag</th><th>Items</th></tr>
+            <tr><td>Bestseller</td><td>Paneer Tikka, Garlic Bread, Mango Shake, Water Bottle, Tandoori Roti, Garlic Naan, Grilled Chicken, Butter Chicken, Paneer Butter Masala, Tiramisu</td></tr>
+            <tr><td>Chef Special</td><td>Bruschetta, Chicken Wings, Stuffed Mushrooms, Cold Coffee, Baguette, Pasta Alfredo, Beef Steak, Pad Thai, Mushroom Risotto, Cheesecake</td></tr>
+            <tr><td>New</td><td>Mozzarella Sticks, Nachos, Mojito, Sourdough Slice, Focaccia, Fish and Chips, Apple Pie, Chocolate Mousse, Panna Cotta, Rasmalai</td></tr>
+        </table>
+    </div>
+
+    <!-- Running the App -->
+    <div class="section">
+        <div class="section-title"><i class="fa-solid fa-terminal"></i> Running the App</div>
+        <pre><code># 1. Install Flask (one-time)
+pip install flask
+
+# 2. Start the server
+python App.py
+
+# 3. Open in your browser
+http://localhost:5000</code></pre>
+        <p class="body-text">The SQLite database <code style="color:var(--gold)">menu.db</code> is created automatically on first run. No manual setup needed.</p>
+    </div>
+
+    <!-- API -->
+    <div class="section">
+        <div class="section-title"><i class="fa-solid fa-plug"></i> API Reference</div>
+        <table>
+            <tr><th>Endpoint</th><th>Method</th><th>Description</th></tr>
+            <tr><td>/api/menu</td><td>GET</td><td>Returns full menu grouped by category</td></tr>
+            <tr><td>/api/check_delivery</td><td>POST</td><td>Accepts {lat, lng} → returns in_range, distance_km, estimated_delivery_min</td></tr>
+            <tr><td>/api/bill</td><td>POST</td><td>Calculates bill + dynamic delivery ETA (prep + travel + buffer)</td></tr>
+            <tr><td>/walkthrough</td><td>GET</td><td>This walkthrough page</td></tr>
+        </table>
+    </div>
+
+    <!-- Order Flow -->
+    <div class="section">
+        <div class="section-title"><i class="fa-solid fa-list-ol"></i> Order Flow</div>
+        <table>
+            <tr><th>Step</th><th>What Happens</th></tr>
+            <tr><td>1. Enter name</td><td>Browser asks for GPS location silently in background</td></tr>
+            <tr><td>2. Range check</td><td>Coords sent to <code>/api/check_delivery</code> — if &gt;15 km, show out-of-range screen</td></tr>
+            <tr><td>3. Browse menu</td><td>Menu loads normally — no ETA shown yet</td></tr>
+            <tr><td>4. Add items &amp; checkout</td><td>Cart sent to <code>/api/bill</code> with <code>distance_km</code></td></tr>
+            <tr><td>5. Receipt</td><td>Shows bill + ETA breakdown + Leaflet map with delivery route</td></tr>
+        </table>
+    </div>
+
+    <!-- Delivery System -->
+    <div class="section">
+        <div class="section-title"><i class="fa-solid fa-motorcycle"></i> Delivery System</div>
+        <p class="body-text">The ETA is calculated <strong style="color:var(--gold)">server-side</strong> in <code style="color:var(--gold)">App.py</code> using constants from <code style="color:var(--gold)">config.py</code>. It only appears on the receipt — <em>after</em> the customer places an order.</p>
+        <table>
+            <tr><th>Component</th><th>Value</th><th>Why</th></tr>
+            <tr><td>Kitchen Prep</td><td>avg of ordered items + 10 min</td><td>Reflects the actual items ordered, plus a 10 min cooking buffer</td></tr>
+            <tr><td>Travel</td><td>4 min/km</td><td>~15 km/h average city speed with traffic &amp; signals</td></tr>
+            <tr><td>Handoff Buffer</td><td>5 min</td><td>Driver finding house / parking</td></tr>
+            <tr><td>Distance Limit</td><td>15 km</td><td>Beyond this → out-of-range screen before menu loads</td></tr>
+        </table>
+        <p class="body-text">Formula: <code style="color:var(--gold)">ETA = (avg_item_prep + 10) + distance_km × 4 + 5</code></p>
+        <p class="body-text">To change server location before a demo: open <code style="color:var(--gold)">config.py</code>, update <code style="color:var(--gold)">SERVER_LAT</code> and <code style="color:var(--gold)">SERVER_LNG</code>, restart Flask.</p>
+    </div>
+
+    <!-- Leaflet Map -->
+    <div class="section">
+        <div class="section-title"><i class="fa-solid fa-map-location-dot"></i> Delivery Route Map (Leaflet + OSM)</div>
+        <p class="body-text">After an order is placed, the receipt modal shows a live <strong style="color:var(--gold)">Leaflet + OpenStreetMap</strong> map — no API key required.</p>
+        <table>
+            <tr><th>Element</th><th>Details</th></tr>
+            <tr><td>🍽 Gold pin</td><td>Restaurant — Bhaskar Mali Chawk, Bhiwandi (from <code>config.py</code>)</td></tr>
+            <tr><td>🏠 Blue pin</td><td>Customer's GPS location</td></tr>
+            <tr><td>Dashed gold line</td><td>Delivery route polyline connecting both points</td></tr>
+            <tr><td>Dark popups</td><td>Custom-styled to match the luxury theme</td></tr>
+        </table>
+        <p class="body-text">The server returns <code style="color:var(--gold)">server_lat</code> and <code style="color:var(--gold)">server_lng</code> in the bill response — the frontend uses these to place the restaurant pin without hardcoding coordinates in JS.</p>
+    </div>
+
+    <!-- File Structure -->
+    <div class="section">
+        <div class="section-title"><i class="fa-solid fa-folder-tree"></i> File Structure</div>
+        <div class="file-tree">
+            <ul>
+                <li><span class="gold">Project Menu/</span>
+                    <ul>
+                        <li><span class="name">App.py</span><span class="note">Flask app + SQLite + API</span></li>
+                        <li><span class="name">config.py</span><span class="note">← Edit server location &amp; delivery settings here</span></li>
+                        <li><span class="name">menu.db</span><span class="note">SQLite DB (auto-generated)</span></li>
+                        <li><span class="gold">static/</span>
+                            <ul>
+                                <li><span class="name">app.js</span><span class="note">Frontend logic</span></li>
+                                <li><span class="name">p.css</span><span class="note">Luxury theme</span></li>
+                                <li><span class="name">Dream_big.jpg</span><span class="note">Welcome background</span></li>
+                            </ul>
+                        </li>
+                        <li><span class="gold">templates/</span>
+                            <ul>
+                                <li><span class="name">index.html</span><span class="note">Main app</span></li>
+                                <li><span class="name">walkthrough.html</span><span class="note">This page</span></li>
+                                <li><span class="name">walkthrough.md</span><span class="note">Raw documentation</span></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- License -->
+    <div class="section">
+        <div class="section-title"><i class="fa-solid fa-scale-balanced"></i> License</div>
+        <p class="body-text">This project is licensed under the <strong style="color:var(--gold)">MIT License</strong>.</p>
+        <p class="body-text">&copy; 2026 Nirbhay Umesh Mali. All rights reserved.</p>
+        <p class="body-text">Made by <strong style="color:var(--gold)">Runtime Terrors</strong>.</p>
+    </div>
+
+</div>
+
+<footer-wt>
+    Built with ❤️ by <a href="/">Runtime Terrors</a> &nbsp;|&nbsp; &copy; 2026 Nirbhay Umesh Mali
+</footer-wt>
+
+</body>
+</html>

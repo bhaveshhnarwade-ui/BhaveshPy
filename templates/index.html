@@ -1,35 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gourmet Bites | Order Online</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Gourmet Bites | Luxury Dining Menu</title>
+    <meta name="description"
+        content="Order premium dishes online at Gourmet Bites. Explore starters, mains, desserts and beverages crafted with passion.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/p.css?v=2">
+    <link rel="stylesheet" href="/static/p.css?v=5">
+    <!-- Leaflet (OpenStreetMap) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
+
 <body>
 
     <!-- Welcome Overlay -->
     <div class="welcome-overlay" id="welcomeOverlay">
         <div class="welcome-content">
-            <h1>Welcome to Gourmet Bites</h1>
-            <p>Please enter your name to start ordering</p>
+            <div class="welcome-logo"><i class="fa-solid fa-utensils"></i></div>
+            <h1>Gourmet Bites</h1>
+            <p>Enter your name to begin your luxury dining experience</p>
             <input type="text" id="customerName" placeholder="Your Name" autocomplete="off">
-            <button id="startOrderingBtn">Start Ordering</button>
-            <div class="made-by">Made By Runtime Terrors</div>
+            <button id="startOrderingBtn">Begin Ordering &nbsp;<i class="fa-solid fa-arrow-right"></i></button>
+            <div class="made-by">Made by <strong>Runtime Terrors</strong></div>
         </div>
     </div>
 
-    <!-- Header Section -->
+    <!-- Header / Navbar -->
     <header class="navbar">
         <div class="logo">
             <i class="fa-solid fa-utensils"></i>
             <span>Gourmet Bites</span>
         </div>
-        <div class="cart-btn" id="openCartBtn">
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span class="cart-count" id="cartCount">0</span>
+
+        <!-- Search Bar (always visible) -->
+        <div class="search-wrapper" id="searchWrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Search dishes..." autocomplete="off">
+        </div>
+
+        <div class="nav-actions">
+            <button class="nav-icon-btn" id="contactNavBtn" title="Contact Us">
+                <i class="fa-solid fa-phone"></i>
+            </button>
+            <div class="cart-btn" id="openCartBtn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
         </div>
     </header>
 
@@ -37,32 +59,50 @@
     <main class="container">
         <!-- Hero Section -->
         <section class="hero">
-            <h1>Savor the Flavor</h1>
-            <p>Order your favorite dishes with a single click. Fresh, fast, and delicious.</p>
+            <div class="hero-inner">
+                <p class="hero-eyebrow">Fine Dining, Delivered</p>
+                <h1>Savor the Flavor</h1>
+                <p class="hero-sub">Handcrafted dishes. Timeless taste. Order in seconds.</p>
+            </div>
         </section>
 
         <!-- Category Filter -->
         <section class="categories" id="categoryFilter">
             <button class="cat-btn active" data-category="All">All</button>
-            <!-- Categories will be injected here dynamically -->
         </section>
+
+        <!-- Search Result Notice -->
+        <div class="search-notice" id="searchNotice" style="display:none;"></div>
 
         <!-- Menu Grid -->
         <section class="menu-grid" id="menuGrid">
-            <!-- Menu items injected dynamically -->
-            <div class="loading">Loading menu...</div>
+            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Loading menu...</div>
         </section>
     </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <i class="fa-solid fa-utensils"></i>
+                <span>Gourmet Bites</span>
+            </div>
+            <p class="footer-copy">Made by <strong>Runtime Terrors</strong>. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="/walkthrough" target="_blank"><i class="fa-solid fa-book-open"></i> Walkthrough</a>
+                <a href="#" id="contactFooterBtn"><i class="fa-solid fa-envelope"></i> Contact Us</a>
+            </div>
+        </div>
+    </footer>
 
     <!-- Shopping Cart Sidebar -->
     <div class="cart-sidebar" id="cartSidebar">
         <div class="cart-header">
-            <h2>Your Order</h2>
+            <h2><i class="fa-solid fa-bag-shopping"></i> &nbsp;Your Order</h2>
             <button class="close-cart" id="closeCartBtn"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="cart-items" id="cartItems">
-            <!-- Cart items injected here -->
-            <p class="empty-cart-msg">Your cart is empty.</p>
+            <p class="empty-cart-msg"><i class="fa-regular fa-face-sad-tear"></i><br>Your cart is empty.</p>
         </div>
         <div class="cart-footer">
             <div class="cart-summary">
@@ -71,19 +111,22 @@
                     <span id="subtotalAmount">$0.00</span>
                 </div>
             </div>
-            <button class="checkout-btn" id="checkoutBtn" disabled>Proceed to Checkout</button>
+            <button class="checkout-btn" id="checkoutBtn" disabled>
+                <i class="fa-solid fa-lock"></i> &nbsp;Proceed to Checkout
+            </button>
         </div>
     </div>
     <div class="cart-overlay" id="cartOverlay"></div>
 
     <!-- Confirm Modal -->
     <div class="bill-modal" id="confirmModal">
-        <div class="bill-content" style="text-align: center; max-width: 400px; padding: 40px;">
-            <h2 style="color: var(--primary); margin-bottom: 15px;">Confirm Order</h2>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Are you sure you want to place this order?</p>
-            <div style="display: flex; gap: 15px; justify-content: center;">
-                <button id="cancelOrderBtn" style="padding: 12px 25px; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--bg-dark); color: var(--text-main); font-weight: 600; cursor: pointer; transition: var(--transition);">Cancel</button>
-                <button id="confirmOrderBtn" style="padding: 12px 25px; border-radius: 10px; border: none; background: var(--primary); color: white; font-weight: 600; cursor: pointer; transition: var(--transition);">Yes, Place Order</button>
+        <div class="bill-content confirm-content">
+            <div class="confirm-icon"><i class="fa-solid fa-crown"></i></div>
+            <h2>Confirm Order</h2>
+            <p>Are you sure you want to place this order?</p>
+            <div class="confirm-actions">
+                <button id="cancelOrderBtn" class="btn-cancel">Cancel</button>
+                <button id="confirmOrderBtn" class="btn-confirm">Yes, Place Order</button>
             </div>
         </div>
     </div>
@@ -95,12 +138,96 @@
                 <h2>Receipt</h2>
                 <button class="close-bill" id="closeBillBtn"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="bill-body" id="billBody">
-                <!-- Bill injected here -->
+            <div class="bill-body" id="billBody"></div>
+        </div>
+    </div>
+
+    <!-- Contact Us Modal -->
+    <div class="bill-modal" id="contactModal">
+        <div class="bill-content contact-content">
+            <div class="bill-header">
+                <h2><i class="fa-solid fa-headset"></i> &nbsp;Contact Us</h2>
+                <button class="close-bill" id="closeContactBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="contact-body">
+                <div class="contact-info-row">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>
+                        <strong>Address</strong>
+                        <p>12 Gourmet Lane, Flavour District<br>Mumbai, Maharashtra 400001</p>
+                    </div>
+                </div>
+                <div class="contact-info-row">
+                    <i class="fa-solid fa-phone"></i>
+                    <div>
+                        <strong>Phone</strong>
+                        <p>+91 98765 43210</p>
+                    </div>
+                </div>
+                <div class="contact-info-row">
+                    <i class="fa-solid fa-envelope"></i>
+                    <div>
+                        <strong>Email</strong>
+                        <p>hello@gourmetbites.in</p>
+                    </div>
+                </div>
+                <div class="contact-info-row">
+                    <i class="fa-solid fa-clock"></i>
+                    <div>
+                        <strong>Hours</strong>
+                        <p>Mon–Sun &nbsp;|&nbsp; 10:00 AM – 11:00 PM</p>
+                    </div>
+                </div>
+                <div class="contact-socials">
+                    <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" title="Twitter / X"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Out-of-Range Overlay (shown by JS when user is too far) -->
+    <div id="outOfRangeOverlay" style="display:none;">
+        <div class="oor-card">
+            <div class="oor-icon"><i class="fa-solid fa-location-xmark"></i></div>
+            <h2>Out of Delivery Range</h2>
+            <p id="oorMessage">We&#39;re growing soon!</p>
+            <div class="oor-sub"><i class="fa-solid fa-motorcycle"></i> Currently serving within <strong>15 km</strong> of Bhiwandi</div>
+        </div>
+    </div>
+
     <script src="/static/app.js"></script>
+
+    <!-- ═══ Inspect / DevTools Protection ═══ -->
+    <script>
+    (function(){
+        // 1. Disable right-click
+        document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+        // 2. Block DevTools keyboard shortcuts
+        document.addEventListener('keydown', function(e){
+            // F12
+            if(e.keyCode === 123){ e.preventDefault(); return false; }
+            // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C
+            if(e.ctrlKey && e.shiftKey && [73,74,67].includes(e.keyCode)){ e.preventDefault(); return false; }
+            // Ctrl+U (view source)
+            if(e.ctrlKey && e.keyCode === 85){ e.preventDefault(); return false; }
+            // Ctrl+S (save page)
+            if(e.ctrlKey && e.keyCode === 83){ e.preventDefault(); return false; }
+        });
+
+        // 3. Detect DevTools via window-size heuristic
+        var _threshold = 160;
+        setInterval(function(){
+            var widthDiff  = window.outerWidth  - window.innerWidth;
+            var heightDiff = window.outerHeight - window.innerHeight;
+            if(widthDiff > _threshold || heightDiff > _threshold){
+                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0a0804;color:#c9a84c;font-family:serif;font-size:1.6rem;">&#128274; Access Restricted</div>';
+            }
+        }, 1000);
+    })();
+    </script>
 </body>
+
 </html>
