@@ -167,12 +167,18 @@ def init_db():
             image_url TEXT DEFAULT ''
         )
     """)
-    c.execute("SELECT COUNT(*) FROM menu_items")
-    if c.fetchone()[0] == 0:
-        c.executemany(
-            "INSERT INTO menu_items VALUES (?,?,?,?,?,?,?,?)",
-            MENU_SEED
-        )
+    c.executemany("""
+        INSERT INTO menu_items (id, category, name, price, description, tag, delivery_time, image_url)
+        VALUES (?,?,?,?,?,?,?,?)
+        ON CONFLICT(id) DO UPDATE SET
+            category=excluded.category,
+            name=excluded.name,
+            price=excluded.price,
+            description=excluded.description,
+            tag=excluded.tag,
+            delivery_time=excluded.delivery_time,
+            image_url=excluded.image_url
+    """, MENU_SEED)
     conn.commit()
     conn.close()
 

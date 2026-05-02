@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
             el.innerHTML = `
                 <div class="item-img-wrap">
                     <img class="item-img" src="${imgUrl}" alt="${item.name}" loading="lazy"
-                         onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&h=300&fit=crop&auto=format'">
+                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&h=300&fit=crop&auto=format'">
                     ${tagHtml}
                 </div>
                 <div class="item-body">
