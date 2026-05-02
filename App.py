@@ -213,12 +213,18 @@ def init_db():
             image_url TEXT DEFAULT ''
         )
     """)
-    c.execute("SELECT COUNT(*) FROM menu_items")
-    if c.fetchone()[0] == 0:
-        c.executemany(
-            "INSERT INTO menu_items VALUES (?,?,?,?,?,?,?,?)",
-            MENU_SEED
-        )
+    c.executemany("""
+        INSERT INTO menu_items (id, category, name, price, description, tag, delivery_time, image_url)
+        VALUES (?,?,?,?,?,?,?,?)
+        ON CONFLICT(id) DO UPDATE SET
+            category=excluded.category,
+            name=excluded.name,
+            price=excluded.price,
+            description=excluded.description,
+            tag=excluded.tag,
+            delivery_time=excluded.delivery_time,
+            image_url=excluded.image_url
+    """, MENU_SEED)
     conn.commit()
     conn.close()
 
@@ -283,9 +289,15 @@ def get_menu():
 # ── Bill ───────────────────────────────────────────────────────────────────
 @app.route("/api/bill", methods=["POST"])
 def calculate_bill():
-    data        = request.json
+    data = request.get_json(force=True)           # FIX 1: was request.json — crashes if Content-Type header is missing
+    if not data:                                   # FIX 2: guard against None body → prevents AttributeError on .get()
+        return jsonify({"error": "Invalid or missing JSON body"}), 400
+
     cart        = data.get("cart", [])
     distance_km = float(data.get("distance_km", 0))
+
+    if not cart:                                   # FIX 3: guard against empty cart → prevents division-by-zero in avg_prep
+        return jsonify({"error": "Cart is empty"}), 400
 
     subtotal   = 0
     items      = []
@@ -316,8 +328,7 @@ def calculate_bill():
 
     tax_rate = 0.08
     tax      = subtotal * tax_rate
-    total    = subtotal + tax
-
+                                                   # FIX 4: removed dead `total = subtotal + tax` line that was overwritten below anyway
     penalty = 0
 
     # Example: if late pickup (you must send this flag from frontend)

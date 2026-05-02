@@ -74,12 +74,15 @@ function formatPrice(amount) {
     // ── Geolocation + Delivery Range Check ────────────────────────────────
     function checkUserLocation() {
         if (!navigator.geolocation) {
-            proceedToMenu(0);
+            showLocationError("Location services are not supported by your browser. We need your location to deliver.");
             return;
         }
         navigator.geolocation.getCurrentPosition(
             (pos) => callDeliveryAPI(pos.coords.latitude, pos.coords.longitude),
-            (err) => { console.warn('Geolocation:', err.message); proceedToMenu(0); },
+            (err) => { 
+                console.warn('Geolocation:', err.message); 
+                showLocationError("Please enable location permissions and refresh. We need your location to verify delivery range."); 
+            },
             { timeout: 8000, maximumAge: 60000 }
         );
     }
@@ -103,7 +106,10 @@ function formatPrice(amount) {
                 showOutOfRange(data.message || "Out of delivery range. We're growing soon!");
             }
         })
-        .catch(() => proceedToMenu(0));
+        .catch(() => {
+            // If the server check fails, we can't verify range.
+            showLocationError("Failed to connect to the server to verify your location. Please try again later.");
+        });
     }
 
     function proceedToMenu(distKm) {
@@ -123,7 +129,29 @@ function formatPrice(amount) {
         setTimeout(() => { welcomeOverlay.style.display = 'none'; }, 850);
         document.body.style.overflow = '';
         if (oorMessage) oorMessage.textContent = msg;
+        
+        // Reset title to out of range just in case
+        const title = outOfRangeOverlay.querySelector('h2');
+        if (title) title.textContent = "Out of Delivery Range";
+        
         outOfRangeOverlay.style.display = 'flex';
+    }
+
+    function showLocationError(msg) {
+        welcomeOverlay.classList.add('hidden');
+        setTimeout(() => { welcomeOverlay.style.display = 'none'; }, 850);
+        document.body.style.overflow = '';
+        if (oorMessage) oorMessage.textContent = msg;
+        
+        // Change title to Location Required
+        const title = outOfRangeOverlay.querySelector('h2');
+        if (title) title.textContent = "Location Required";
+        
+        outOfRangeOverlay.style.display = 'flex';
+        
+        // Re-enable button in case they go back
+        startOrderingBtn.disabled = false;
+        startOrderingBtn.innerHTML = 'Begin Ordering &nbsp;<i class="fa-solid fa-arrow-right"></i>';
     }
 
     // ── Fetch Menu ────────────────────────────────────────────────────────
@@ -246,7 +274,7 @@ function setCategory(cat) {
             el.innerHTML = `
                 <div class="item-img-wrap">
                     <img class="item-img" src="${imgUrl}" alt="${item.name}" loading="lazy"
-                         onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&h=300&fit=crop&auto=format'">
+                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&h=300&fit=crop&auto=format'">
                     ${tagHtml}
                 </div>
                 <div class="item-body">
@@ -397,9 +425,7 @@ function setCategory(cat) {
                 </div>`;
         });
 
-        
-
-        const eta      = data.delivery_time || 20;
+        const eta      = data.delivery_time || 20;   // FIX 1: was data.pickup_time (undefined) — backend key is delivery_time
         const dist     = data.distance_km   || 0;
         const avgPrep  = data.avg_prep_min  || 15;
         const distLabel = dist > 0 ? ` &nbsp;·&nbsp; ${dist.toFixed(1)} km` : '';
@@ -427,7 +453,7 @@ function setCategory(cat) {
             <div class="delivery-banner">
                 <i class="fa-solid fa-motorcycle"></i>
                 <div>
-                    <p><strong>Pickup after:</strong> ~${data.pickup_time} minutes</p>
+                    <p><strong>Pickup after:</strong> ~${eta} minutes</p>
                     <p>Follow the route below to reach the restaurant.</p>
                     <p style="font-size:.78rem;margin-top:4px;opacity:.7;">
                         Avg kitchen prep ${avgPrep} min
@@ -457,41 +483,38 @@ function setCategory(cat) {
 
         billModal.classList.add('show');
 
+        // FIX 2: Destroy existing map instance BEFORE creating a new one
+        // (was placed after initMap call — too late, caused "already initialized" error)
+        if (deliveryMapInstance) {
+            deliveryMapInstance.remove();
+            deliveryMapInstance = null;
+        }
+
         // Init Leaflet map after the modal is visible and DOM is painted
         if (data.server_lat && userLat) {
             setTimeout(() => {
                 initMap(data.server_lat, data.server_lng, userLat, userLng);
             }, 100);
         }
+    }
 
-    
-        // Destroy existing map instance to avoid "Map container is already initialized"
-        if (deliveryMapInstance) {
-            deliveryMapInstance.remove();
-            deliveryMapInstance = null;
-        }
+    // FIX 3: Moved closeBillBtn listener OUTSIDE showBill() — was inside,
+    // causing duplicate listeners to stack up on every order placed
+    closeBillBtn.addEventListener('click', () => {
+        billModal.classList.remove('show');
+    });
 
     function initMap(resLat, resLng, userLat, userLng) {
+        // FIX 4: Removed the erroneous second destroy block that was INSIDE
+        // initMap() and killed the map immediately after creating it
+
         deliveryMapInstance = L.map('deliveryMap').setView([userLat, userLng], 13);
 
-        // Destroy existing map instance to avoid "Map container is already initialized"
-        if (deliveryMapInstance) {
-            deliveryMapInstance.remove();
-            deliveryMapInstance = null;
-        }
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    L.marker([resLat, resLng]).addTo(map).bindPopup("Restaurant");
-    L.marker([userLat, userLng]).addTo(map).bindPopup("You");
-
-    L.polyline([
-        [resLat, resLng],
-        [userLat, userLng]
-    ]).addTo(map);
-}
-        
+        // FIX 5: All .addTo(map) replaced with .addTo(deliveryMapInstance)
+        // `map` was never defined — the variable is named deliveryMapInstance
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(deliveryMapInstance);
 
         // ── Custom gold icon for restaurant ──────────────────────────────
         const restaurantIcon = L.divIcon({
@@ -512,11 +535,11 @@ function setCategory(cat) {
         });
 
         const restaurantMarker = L.marker([resLat, resLng], { icon: restaurantIcon })
-            .addTo(map)
+            .addTo(deliveryMapInstance)
             .bindPopup('<strong>🍽 Gourmet Bites</strong><br>Pickup Location');
 
         const userMarker = L.marker([userLat, userLng], { icon: userIcon })
-            .addTo(map)
+            .addTo(deliveryMapInstance)
             .bindPopup(`<strong>📍 Your Location</strong>`);
 
         // Dashed delivery route line
@@ -525,19 +548,15 @@ function setCategory(cat) {
             weight: 3,
             opacity: 0.85,
             dashArray: '8, 6'
-        }).addTo(map);
+        }).addTo(deliveryMapInstance);
 
         // Fit map to show both markers with padding
         const bounds = L.latLngBounds([[resLat, resLng], [userLat, userLng]]);
-        map.fitBounds(bounds, { padding: [30, 30] });
+        deliveryMapInstance.fitBounds(bounds, { padding: [30, 30] });
 
         // Force re-render in case modal caused layout shift
-        map.invalidateSize();
+        deliveryMapInstance.invalidateSize();
     }
-
-    closeBillBtn.addEventListener('click', () => {
-        billModal.classList.remove('show');
-    });
 
     // ── Contact Modal ─────────────────────────────────────────────────────
     function openContact() { contactModal.classList.add('show'); }
